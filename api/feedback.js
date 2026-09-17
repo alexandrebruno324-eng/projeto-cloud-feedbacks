@@ -1,5 +1,8 @@
+import { Resend } from "resend";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 if (!getApps().length) {
   initializeApp({
@@ -94,7 +97,19 @@ Responda SOMENTE em JSON neste formato:
       .trim();
 
     const analise = JSON.parse(textoLimpo);
-
+if (analise.sentimento === "negativo") {
+  await resend.emails.send({
+    from: "Feedback Cloud <onboarding@resend.dev>",
+    to: "alexandrebruno324@gmail.com",
+    subject: "🚨 Novo feedback negativo",
+    html: `
+      <h2>Feedback negativo recebido</h2>
+      <p><strong>Feedback:</strong> ${texto}</p>
+      <p><strong>Categoria:</strong> ${analise.categoria}</p>
+      <p><strong>Sentimento:</strong> ${analise.sentimento}</p>
+    `,
+  });
+}
     await db.collection("feedbacks").add({
       texto,
       sentimento: analise.sentimento,
