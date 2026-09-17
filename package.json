@@ -1,0 +1,25 @@
+{
+  "name": "projeto-cloud-feedbacks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexandrebruno324-eng/projeto-cloud-feedbacks.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexandrebruno324-eng/projeto-cloud-feedbacks/issues"
+  },
+  "homepage": "https://github.com/alexandrebruno324-eng/projeto-cloud-feedbacks#readme",
+  "dependencies": {
+    "@google/genai": "^2.23.0",
+    "@google/generative-ai": "^0.24.1",
+    "firebase-admin": "^14.4.0"
+  }
+}
