@@ -98,7 +98,7 @@ Responda SOMENTE em JSON neste formato:
 
     const analise = JSON.parse(textoLimpo);
 if (analise.sentimento === "negativo") {
-  await resend.emails.send({
+  const respostaEmail = await resend.emails.send({
     from: "Feedback Cloud <onboarding@resend.dev>",
     to: "alexandrebruno324@gmail.com",
     subject: "🚨 Novo feedback negativo",
@@ -109,7 +109,9 @@ if (analise.sentimento === "negativo") {
       <p><strong>Sentimento:</strong> ${analise.sentimento}</p>
     `,
   });
+    console.log("Resposta Resend:", respostaEmail);
 }
+  
     await db.collection("feedbacks").add({
       texto,
       sentimento: analise.sentimento,
