@@ -1,11 +1,13 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
-import serviceAccount from "../Firebase-key.json" with { type: "json" };
-
 if (!getApps().length) {
   initializeApp({
-    credential: cert(serviceAccount),
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
   });
 }
 
@@ -28,9 +30,9 @@ export default async function handler(req, res) {
 
   try {
     const prompt = `
-Analise o feedback abaixo.
+Analise o feedback abaixo:
 
-Feedback: "${texto}"
+"${texto}"
 
 Classifique o sentimento como:
 positivo, negativo ou neutro.
@@ -55,20 +57,14 @@ Responda SOMENTE em JSON neste formato:
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
           "x-goog-api-key": process.env.GEMINI_API_KEY,
         },
-
         body: JSON.stringify({
           contents: [
             {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
+              parts: [{ text: prompt }],
             },
           ],
         }),
@@ -100,7 +96,7 @@ Responda SOMENTE em JSON neste formato:
     const analise = JSON.parse(textoLimpo);
 
     await db.collection("feedbacks").add({
-      texto: texto,
+      texto,
       sentimento: analise.sentimento,
       categoria: analise.categoria,
       criadoEm: FieldValue.serverTimestamp(),
