@@ -94,48 +94,30 @@
 
   </div>
 
-  <script>
-    async function analisarFeedback() {
-
-      const texto = document.getElementById("texto").value;
-      const resultado = document.getElementById("resultado");
-
-      if (!texto.trim()) {
-        resultado.innerText = "Digite um feedback primeiro.";
-        return;
-      }
-
-      resultado.innerText = "Analisando...";
-
-      try {
-
-        const resposta = await fetch("/api/feedback", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ texto })
-        });
-
-        const dados = await resposta.json();
-
-        if (!resposta.ok) {
-          resultado.innerText = "Erro ao analisar o feedback.";
-          return;
-        }
-
-        resultado.innerText =
-          "Sentimento: " + dados.sentimento +
-          " | Categoria: " + dados.categoria;
-
-      } catch (erro) {
-
-        resultado.innerText =
-          "Não foi possível conectar com o servidor.";
-
-      }
-    }
-  </script>
+  <script type="module">
+import { auth } from "./js/firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+let usuarioAtual = null;
+onAuthStateChanged(auth, usuario => { usuarioAtual = usuario; });
+window.analisarFeedback = async function() {
+  const texto = document.getElementById("texto").value.trim();
+  const resultado = document.getElementById("resultado");
+  if (!texto) { resultado.textContent = "Digite um feedback primeiro."; return; }
+  if (!usuarioAtual) { resultado.textContent = "Faça login na área do cliente antes de analisar."; return; }
+  if (!usuarioAtual.emailVerified) { resultado.textContent = "Confirme seu e-mail antes de continuar."; return; }
+  resultado.textContent = "Analisando...";
+  try {
+    const token = await usuarioAtual.getIdToken();
+    const resposta = await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ texto }) });
+    const dados = await resposta.json();
+    if (!resposta.ok) { resultado.textContent = dados.erro || "Erro ao analisar o feedback."; return; }
+    resultado.textContent = `Sentimento: ${dados.sentimento} | Categoria: ${dados.categoria}`;
+  } catch (erro) {
+    console.error(erro);
+    resultado.textContent = "Não foi possível concluir a análise.";
+  }
+};
+</script>
 
 </body>
 </html>

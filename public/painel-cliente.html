@@ -22,6 +22,7 @@
         type="module"
         src="js/painel-cliente.js"
     ></script>
+    <script type="module" src="js/historico-avaliacoes.js"></script>
 </head>
 
 <body>
@@ -460,6 +461,20 @@
                             ></p>
                         </form>
                     </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="avaliacoes" id="historico-avaliacoes">
+            <div class="container">
+                <div class="secao-titulo">
+                    <span class="etiqueta">HISTÓRICO</span>
+                    <h2>Minhas avaliações</h2>
+                    <p>Consulte as avaliações enviadas para suas entregas.</p>
+                </div>
+                <div id="lista-avaliacoes" aria-live="polite">
+                    Carregando avaliações...
                 </div>
             </div>
         </section>

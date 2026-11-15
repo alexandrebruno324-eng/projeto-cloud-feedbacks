@@ -94,7 +94,8 @@ async function executarApi(req, res, caminho) {
 
     const modulos = {
         "/api/feedback": "./api/feedback.js",
-        "/api/encomendas": "./api/encomendas.js"
+        "/api/encomendas": "./api/encomendas.js",
+        "/api/minhas-avaliacoes": "./api/minhas-avaliacoes.js"
     };
 
     const modulo = modulos[caminho];
