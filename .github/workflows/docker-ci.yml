@@ -1,0 +1,64 @@
+
+name: BRN Transportes - Docker CI
+
+on:
+  push:
+    branches:
+      - desenvolvimento-brn
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    name: Construir e testar Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar codigo do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construir imagem Docker
+        run: docker build -t brn-transportes:ci .
+
+      - name: Iniciar container de teste
+        run: |
+          docker run -d \
+            --name brn-ci \
+            -p 3001:3000 \
+            brn-transportes:ci
+
+      - name: Testar API de saude
+        run: |
+          for tentativa in $(seq 1 20); do
+            if curl --fail --silent --show-error \
+              http://localhost:3001/health; then
+              echo "Servidor BRN funcionando"
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs brn-ci
+          exit 1
+
+      - name: Testar pagina inicial
+        run: |
+          curl --fail --silent --show-error \
+            --output /dev/null \
+            http://localhost:3001/home.html
+
+      - name: Exibir logs em caso de falha
+        if: failure()
+        run: docker logs brn-ci || true
+
+      - name: Encerrar container
+        if: always()
+        run: docker rm -f brn-ci || true
