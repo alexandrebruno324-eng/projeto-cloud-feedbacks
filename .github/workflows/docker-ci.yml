@@ -1,5 +1,5 @@
 
-name: BRN Transportes - Docker CI
+name: BRN Transportes - Docker CI/CD
 
 on:
   push:
@@ -12,35 +12,36 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   docker:
-    name: Construir e testar Docker
+    name: Testar e publicar Docker
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar codigo do repositorio
+      - name: Baixar codigo
         uses: actions/checkout@v4
 
       - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Construir imagem Docker
+      - name: Construir imagem
         run: docker build -t brn-transportes:ci .
 
-      - name: Iniciar container de teste
+      - name: Iniciar container
         run: |
           docker run -d \
             --name brn-ci \
             -p 3001:3000 \
             brn-transportes:ci
 
-      - name: Testar API de saude
+      - name: Testar servidor
         run: |
           for tentativa in $(seq 1 20); do
-            if curl --fail --silent --show-error \
+            if curl --fail --silent \
               http://localhost:3001/health; then
-              echo "Servidor BRN funcionando"
+              echo "Teste de saude aprovado"
               exit 0
             fi
             sleep 2
@@ -51,14 +52,36 @@ jobs:
 
       - name: Testar pagina inicial
         run: |
-          curl --fail --silent --show-error \
+          curl --fail --show-error --silent \
             --output /dev/null \
             http://localhost:3001/home.html
 
-      - name: Exibir logs em caso de falha
+      - name: Exibir logs em caso de erro
         if: failure()
         run: docker logs brn-ci || true
 
       - name: Encerrar container
         if: always()
         run: docker rm -f brn-ci || true
+
+      - name: Autenticar no GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publicar imagem no GHCR
+        if: github.event_name == 'push'
+        env:
+          REPOSITORY: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          IMAGE="ghcr.io/${REPOSITORY,,}"
+          docker tag brn-transportes:ci "$IMAGE:$BRANCH"
+          docker tag brn-transportes:ci "$IMAGE:$COMMIT_SHA"
+          docker push "$IMAGE:$BRANCH"
+          docker push "$IMAGE:$COMMIT_SHA"
+          echo "Imagem publicada: $IMAGE:$BRANCH"
