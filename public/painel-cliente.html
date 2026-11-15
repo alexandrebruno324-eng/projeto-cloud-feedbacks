@@ -1,0 +1,550 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07140c">
+    <meta
+        name="description"
+        content="Painel do Cliente BRN Transportes. Acompanhe suas encomendas, avalie entregas e participe do BRN Rewards."
+    >
+
+    <title>Meu Painel | BRN Transportes e Logística</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="assets/images/logo-brn-claro.png"
+    >
+    <link rel="stylesheet" href="css/painel-cliente.css">
+    <script
+        type="module"
+        src="js/painel-cliente.js"
+    ></script>
+</head>
+
+<body>
+    <header class="cabecalho">
+        <a
+            href="home.html"
+            class="marca"
+            aria-label="Voltar à página inicial da BRN"
+        >
+            <picture>
+                <source
+                    srcset="assets/images/logo-brn-escuro.png"
+                    media="(prefers-color-scheme: dark)"
+                >
+                <img
+                    src="assets/images/logo-brn-claro.png"
+                    alt="BRN Transportes e Logística"
+                    class="logo"
+                    width="122"
+                    height="104"
+                >
+            </picture>
+        </a>
+
+        <nav aria-label="Navegação principal">
+            <a href="home.html">Início</a>
+            <a href="servicos.html">Serviços</a>
+            <a href="sobre.html">Sobre nós</a>
+            <a href="painel-cliente.html" aria-current="page">
+                Meu Painel
+            </a>
+        </nav>
+
+        <button type="button" id="sair-conta" class="botao-sair">
+            Sair da conta
+        </button>
+    </header>
+
+    <main class="painel" id="painel" hidden>
+        <section class="boas-vindas">
+            <div class="container">
+                <span class="etiqueta">ÁREA EXCLUSIVA BRN</span>
+
+                <h1>
+                    Bem-vindo ao seu painel.
+                </h1>
+
+                <p id="email-cliente"></p>
+
+                <p>
+                    Acompanhe suas encomendas, consulte suas avaliações
+                    e aproveite os benefícios do BRN Rewards.
+                </p>
+            </div>
+        </section>
+
+        <section class="resumo" aria-label="Resumo da conta">
+            <div class="container grade-resumo">
+                <article class="cartao-resumo">
+                    <div class="icone-resumo" aria-hidden="true">
+                        <span>01</span>
+                    </div>
+
+                    <div>
+                        <span class="titulo-resumo">
+                            Total de encomendas
+                        </span>
+
+                        <strong id="total-encomendas">—</strong>
+                    </div>
+                </article>
+
+                <article class="cartao-resumo">
+                    <div class="icone-resumo" aria-hidden="true">
+                        <span>02</span>
+                    </div>
+
+                    <div>
+                        <span class="titulo-resumo">
+                            Em transporte
+                        </span>
+
+                        <strong id="em-transporte">—</strong>
+                    </div>
+                </article>
+
+                <article class="cartao-resumo">
+                    <div class="icone-resumo" aria-hidden="true">
+                        <span>03</span>
+                    </div>
+
+                    <div>
+                        <span class="titulo-resumo">
+                            Entregas concluídas
+                        </span>
+
+                        <strong id="entregas-concluidas">—</strong>
+                    </div>
+                </article>
+
+                <article class="cartao-resumo destaque-rewards">
+                    <div class="icone-resumo" aria-hidden="true">
+                        <span>BRN</span>
+                    </div>
+
+                    <div>
+                        <span class="titulo-resumo">
+                            Saldo BRN Rewards
+                        </span>
+
+                        <strong id="saldo-pontos">—</strong>
+                        <small>pontos</small>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section
+            class="encomendas"
+            id="minhas-encomendas"
+            aria-labelledby="titulo-encomendas"
+        >
+            <div class="container">
+                <div class="secao-titulo">
+                    <span class="etiqueta">RASTREAMENTO</span>
+
+                    <h2 id="titulo-encomendas">
+                        Minhas encomendas
+                    </h2>
+
+                    <p>
+                        Acompanhe as movimentações e o andamento
+                        das suas entregas em um só lugar.
+                    </p>
+                </div>
+
+                <div class="barra-pesquisa">
+                    <form id="form-rastreamento">
+                        <label for="codigo-rastreamento">
+                            Código de rastreamento
+                        </label>
+
+                        <div class="campo-pesquisa">
+                            <input
+                                type="text"
+                                id="codigo-rastreamento"
+                                name="codigo-rastreamento"
+                                placeholder="Digite o código da encomenda"
+                                maxlength="60"
+                                autocomplete="off"
+                            >
+
+                            <button type="submit">
+                                Buscar encomenda
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <p
+                    id="mensagem-rastreamento"
+                    class="mensagem"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+                <div id="lista-encomendas" class="lista-encomendas">
+                    <div class="estado-vazio">
+                        <h3>Carregando suas encomendas</h3>
+                        <p>
+                            Aguarde enquanto consultamos suas informações.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="detalhes-entrega"
+            id="detalhes-entrega"
+            aria-labelledby="titulo-detalhes"
+            hidden
+        >
+            <div class="container">
+                <div class="secao-titulo">
+                    <span class="etiqueta">ACOMPANHAMENTO</span>
+
+                    <h2 id="titulo-detalhes">
+                        Detalhes da entrega
+                    </h2>
+                </div>
+
+                <div class="grade-detalhes">
+                    <article class="cartao-detalhes">
+                        <h3>Informações da encomenda</h3>
+
+                        <dl class="informacoes-pedido">
+                            <div>
+                                <dt>Código</dt>
+                                <dd id="detalhe-codigo">—</dd>
+                            </div>
+
+                            <div>
+                                <dt>Status</dt>
+                                <dd id="detalhe-status">—</dd>
+                            </div>
+
+                            <div>
+                                <dt>Origem</dt>
+                                <dd id="detalhe-origem">—</dd>
+                            </div>
+
+                            <div>
+                                <dt>Destino</dt>
+                                <dd id="detalhe-destino">—</dd>
+                            </div>
+
+                            <div>
+                                <dt>Previsão de entrega</dt>
+                                <dd id="detalhe-previsao">—</dd>
+                            </div>
+
+                            <div>
+                                <dt>Data da entrega</dt>
+                                <dd id="detalhe-data-entrega">—</dd>
+                            </div>
+                        </dl>
+                    </article>
+
+                    <article class="cartao-detalhes">
+                        <h3>Histórico de movimentações</h3>
+
+                        <ol
+                            id="linha-do-tempo"
+                            class="linha-do-tempo"
+                        ></ol>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="avaliacoes"
+            id="avaliacoes"
+            aria-labelledby="titulo-avaliacoes"
+        >
+            <div class="container">
+                <div class="secao-titulo">
+                    <span class="etiqueta">SUA OPINIÃO IMPORTA</span>
+
+                    <h2 id="titulo-avaliacoes">
+                        Avalie sua entrega
+                    </h2>
+
+                    <p>
+                        Após receber sua encomenda, conte como foi
+                        sua experiência. Sua avaliação ajuda a BRN
+                        a identificar pontos positivos e oportunidades
+                        de melhoria.
+                    </p>
+                </div>
+
+                <div class="grade-avaliacao">
+                    <div class="apresentacao-avaliacao">
+                        <h3>Seu feedback gera melhorias.</h3>
+
+                        <p>
+                            As avaliações serão analisadas por
+                            inteligência artificial para identificar
+                            sentimentos, problemas e sugestões.
+                        </p>
+
+                        <p>
+                            Você receberá pontos BRN Rewards
+                            por participar, independentemente
+                            de sua avaliação ser positiva,
+                            neutra ou negativa.
+                        </p>
+                    </div>
+
+                    <div class="cartao-avaliacao">
+                        <form id="form-avaliacao">
+                            <label for="entrega-avaliacao">
+                                Encomenda entregue
+                            </label>
+
+                            <select
+                                id="entrega-avaliacao"
+                                name="entrega-avaliacao"
+                                required
+                            >
+                                <option value="">
+                                    Selecione uma entrega
+                                </option>
+                            </select>
+
+                            <label for="nota-entrega">
+                                Nota geral
+                            </label>
+
+                            <select
+                                id="nota-entrega"
+                                name="nota-entrega"
+                                required
+                            >
+                                <option value="">
+                                    Selecione sua nota
+                                </option>
+                                <option value="1">
+                                    1 estrela — Muito ruim
+                                </option>
+                                <option value="2">
+                                    2 estrelas — Ruim
+                                </option>
+                                <option value="3">
+                                    3 estrelas — Regular
+                                </option>
+                                <option value="4">
+                                    4 estrelas — Bom
+                                </option>
+                                <option value="5">
+                                    5 estrelas — Excelente
+                                </option>
+                            </select>
+
+                            <label for="prazo-entrega">
+                                Prazo de entrega
+                            </label>
+
+                            <select
+                                id="prazo-entrega"
+                                name="prazo-entrega"
+                                required
+                            >
+                                <option value="">
+                                    Selecione uma opção
+                                </option>
+                                <option value="antes">
+                                    Chegou antes do prazo
+                                </option>
+                                <option value="no-prazo">
+                                    Chegou no prazo
+                                </option>
+                                <option value="atrasada">
+                                    Chegou com atraso
+                                </option>
+                            </select>
+
+                            <label for="condicao-produto">
+                                Condições do produto
+                            </label>
+
+                            <select
+                                id="condicao-produto"
+                                name="condicao-produto"
+                                required
+                            >
+                                <option value="">
+                                    Selecione uma opção
+                                </option>
+                                <option value="perfeito">
+                                    Produto em perfeitas condições
+                                </option>
+                                <option value="embalagem-danificada">
+                                    Embalagem danificada
+                                </option>
+                                <option value="produto-danificado">
+                                    Produto danificado
+                                </option>
+                                <option value="outro-problema">
+                                    Outro problema
+                                </option>
+                            </select>
+
+                            <label for="atendimento">
+                                Atendimento
+                            </label>
+
+                            <select
+                                id="atendimento"
+                                name="atendimento"
+                                required
+                            >
+                                <option value="">
+                                    Selecione uma opção
+                                </option>
+                                <option value="excelente">
+                                    Excelente
+                                </option>
+                                <option value="bom">
+                                    Bom
+                                </option>
+                                <option value="regular">
+                                    Regular
+                                </option>
+                                <option value="ruim">
+                                    Ruim
+                                </option>
+                                <option value="nao-utilizado">
+                                    Não precisei de atendimento
+                                </option>
+                            </select>
+
+                            <label for="comentario">
+                                Conte sua experiência
+                            </label>
+
+                            <textarea
+                                id="comentario"
+                                name="comentario"
+                                rows="5"
+                                maxlength="2000"
+                                placeholder="O que funcionou bem? O que podemos melhorar?"
+                            ></textarea>
+
+                            <p class="aviso-pontos">
+                                Ao concluir uma avaliação elegível,
+                                você poderá receber 50 pontos BRN Rewards.
+                                Os pontos são fictícios e válidos
+                                apenas neste projeto acadêmico.
+                            </p>
+
+                            <button
+                                type="submit"
+                                id="enviar-avaliacao"
+                                disabled
+                            >
+                                Enviar avaliação
+                            </button>
+
+                            <p
+                                id="mensagem-avaliacao"
+                                class="mensagem"
+                                role="status"
+                                aria-live="polite"
+                            ></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="rewards"
+            id="rewards"
+            aria-labelledby="titulo-rewards"
+        >
+            <div class="container">
+                <div class="secao-titulo">
+                    <span class="etiqueta">BRN REWARDS</span>
+
+                    <h2 id="titulo-rewards">
+                        Sua opinião tem valor.
+                    </h2>
+
+                    <p>
+                        Nosso programa de recompensas incentiva
+                        a participação dos clientes e valoriza
+                        avaliações sinceras.
+                    </p>
+                </div>
+
+                <div class="grade-rewards">
+                    <article class="cartao-rewards">
+                        <span class="rewards-numero">50</span>
+
+                        <h3>Pontos por avaliação</h3>
+
+                        <p>
+                            Receba pontos ao avaliar uma
+                            entrega concluída, respeitando
+                            as regras de participação.
+                        </p>
+                    </article>
+
+                    <article class="cartao-rewards">
+                        <span class="rewards-numero">+20</span>
+
+                        <h3>Feedback detalhado</h3>
+
+                        <p>
+                            Pontuação adicional prevista para
+                            avaliações que apresentem informações
+                            úteis, sem exigir opiniões positivas.
+                        </p>
+                    </article>
+
+                    <article class="cartao-rewards">
+                        <span class="rewards-numero">500</span>
+
+                        <h3>Recompensas fictícias</h3>
+
+                        <p>
+                            Exemplo de pontuação para o resgate
+                            de benefícios simulados no
+                            ambiente acadêmico.
+                        </p>
+                    </article>
+                </div>
+
+                <p class="aviso-rewards">
+                    O BRN Rewards é um recurso demonstrativo.
+                    Não há conversão dos pontos em dinheiro,
+                    descontos comerciais ou serviços reais.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <section
+        id="verificando-acesso"
+        class="verificando-acesso"
+        role="status"
+        aria-live="polite"
+    >
+        <p>Verificando acesso à sua conta...</p>
+    </section>
+
+    <footer>
+        <p>
+            &copy; 2026 BRN Transportes e Logística.
+            Projeto acadêmico fictício.
+        </p>
+    </footer>
+</body>
+</html>

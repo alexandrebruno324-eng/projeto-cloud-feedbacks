@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07140c">
+
+    <meta
+        name="description"
+        content="Área do Cliente BRN Transportes e Logística. Acesse sua conta, acompanhe encomendas e avalie suas entregas."
+    >
+
+    <title>Área do Cliente | BRN Transportes e Logística</title>
+
+    <link rel="icon" type="image/png" href="assets/images/logo-brn-claro.png">
+    <link rel="stylesheet" href="css/cliente.css">
+    <script type="module" src="js/cliente.js"></script>
+</head>
+
+<body>
+    <header class="cabecalho">
+        <a href="home.html" class="marca" aria-label="BRN Transportes - Página inicial">
+            <picture>
+                <source
+                    srcset="assets/images/logo-brn-escuro.png"
+                    media="(prefers-color-scheme: dark)"
+                >
+
+                <img
+                    src="assets/images/logo-brn-claro.png"
+                    alt="BRN Transportes e Logística"
+                    class="logo"
+                    width="122"
+                    height="104"
+                >
+            </picture>
+        </a>
+
+        <nav aria-label="Navegação principal">
+            <a href="home.html">Início</a>
+            <a href="servicos.html">Serviços</a>
+            <a href="sobre.html">Sobre nós</a>
+            <a href="#acesso" aria-current="page">Área do Cliente</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="apresentacao" aria-labelledby="titulo-cliente">
+            <div class="conteudo">
+                <span class="etiqueta">
+                    BRN TRANSPORTES E LOGÍSTICA
+                </span>
+
+                <h1 id="titulo-cliente">
+                    Sua carga. Nosso compromisso.
+                </h1>
+
+                <p>
+                    Acompanhe suas encomendas, consulte o histórico
+                    de movimentações e tenha mais controle sobre
+                    cada etapa da sua entrega.
+                </p>
+            </div>
+        </section>
+
+        <section class="acesso" id="acesso" aria-labelledby="titulo-login">
+            <div class="cartao-login">
+                <div class="titulo-login">
+                    <span>ÁREA EXCLUSIVA DO CLIENTE</span>
+
+                    <h2 id="titulo-login">
+                        Acesse sua conta
+                    </h2>
+
+                    <p>
+                        Entre com seu e-mail e senha para consultar
+                        suas encomendas e acompanhar suas entregas.
+                    </p>
+                </div>
+
+                <form id="form-login" method="post">
+                    <label for="email">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="seuemail@exemplo.com"
+                        autocomplete="email"
+                        maxlength="254"
+                        required
+                    >
+
+                    <label for="senha">
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button type="submit" id="entrar">
+                        Entrar na minha conta
+                    </button>
+
+                    <p
+                        id="mensagem"
+                        role="status"
+                        aria-live="polite"
+                    ></p>
+                </form>
+
+                <div class="opcoes">
+                    <button type="button" id="criar-conta">
+                        Criar conta
+                    </button>
+
+                    <button type="button" id="esqueci-senha">
+                        Esqueci minha senha
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="informacoes" aria-label="Recursos da Área do Cliente">
+            <article class="informacao">
+                <h3>Rastreamento completo</h3>
+
+                <p>
+                    Acompanhe o andamento das suas encomendas
+                    e consulte o histórico de movimentações
+                    em cada etapa do transporte.
+                </p>
+            </article>
+
+            <article class="informacao">
+                <h3>Atualizações da entrega</h3>
+
+                <p>
+                    Consulte as informações de coleta,
+                    transferência entre unidades,
+                    saída para entrega e recebimento.
+                </p>
+            </article>
+
+            <article class="informacao">
+                <h3>Avalie sua experiência</h3>
+
+                <p>
+                    Após receber sua encomenda, avalie
+                    o prazo de entrega, as condições
+                    do produto e a qualidade do atendimento.
+                </p>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            &copy; 2026 BRN Transportes e Logística.
+            Projeto acadêmico fictício.
+        </p>
+    </footer>
+</body>
+</html>

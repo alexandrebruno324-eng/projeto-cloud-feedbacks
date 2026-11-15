@@ -1,0 +1,617 @@
+
+:root {
+    color-scheme: light;
+    --verde: #18c964;
+    --verde-claro: #55ef91;
+    --verde-escuro: #0ea651;
+    --preto: #07140c;
+    --fundo: #f4f7f5;
+    --superficie: #ffffff;
+    --texto: #102018;
+    --texto-secundario: #617368;
+    --borda: #dce8df;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    width: 90%;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    width: 100%;
+    min-height: 112px;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.78) 0%,
+        rgba(0, 0, 0, 0.28) 65%,
+        transparent 100%
+    );
+}
+
+.cabecalho {
+    width: 100%;
+    max-width: none;
+    min-height: 112px;
+    padding: 12px clamp(20px, 4vw, 65px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+}
+
+.marca,
+.marca picture {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.logo {
+    display: block;
+    width: 122px;
+    height: 104px;
+    object-fit: contain;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    column-gap: clamp(18px, 2.6vw, 40px);
+    row-gap: 8px;
+}
+
+nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 9px 0;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.25s ease;
+}
+
+nav a::after {
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--verde);
+    transition: width 0.25s ease;
+}
+
+nav a:hover {
+    color: var(--verde-claro);
+}
+
+nav a:hover::after,
+nav a:focus-visible::after,
+nav a[aria-current="page"]::after {
+    width: 100%;
+}
+
+.banner {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    background-image:
+        linear-gradient(
+            90deg,
+            rgba(1, 9, 6, 0.88) 0%,
+            rgba(1, 9, 6, 0.65) 30%,
+            rgba(1, 9, 6, 0.21) 65%,
+            rgba(1, 9, 6, 0.07) 100%
+        ),
+        url("../assets/images/caminhao-volvo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.banner .container {
+    padding-top: 170px;
+    padding-bottom: 90px;
+}
+
+.etiqueta {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #66efa0;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    line-height: 1.5;
+}
+
+.banner h1 {
+    max-width: 690px;
+    margin-bottom: 25px;
+    color: #ffffff;
+    font-size: clamp(38px, 5vw, 68px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    text-shadow: 0 3px 20px rgba(0, 0, 0, 0.25);
+}
+
+.banner p {
+    max-width: 540px;
+    margin-bottom: 32px;
+    color: #e6eee8;
+    font-size: clamp(16px, 1.5vw, 20px);
+    line-height: 1.7;
+}
+
+.botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 54px;
+    padding: 15px 28px;
+    background: var(--verde);
+    color: var(--preto);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 6px 24px rgba(24, 201, 100, 0.2);
+    transition:
+        background-color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.botao:hover {
+    background: var(--verde-claro);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(24, 201, 100, 0.3);
+}
+
+.modalidades {
+    padding: 95px 0 110px;
+}
+
+.secao-titulo {
+    max-width: 760px;
+    margin-bottom: 44px;
+}
+
+.secao-titulo .etiqueta {
+    color: #0b8747;
+}
+
+.secao-titulo h2 {
+    margin-bottom: 17px;
+    color: var(--texto);
+    font-size: clamp(29px, 3.5vw, 44px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.7px;
+}
+
+.secao-titulo p {
+    max-width: 650px;
+    color: var(--texto-secundario);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.grade-servicos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.cartao-servico {
+    min-width: 0;
+    overflow: hidden;
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-radius: 16px;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.cartao-servico:hover {
+    transform: translateY(-5px);
+    border-color: rgba(24, 201, 100, 0.6);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1);
+}
+
+.cartao-servico img {
+    display: block;
+    width: 100%;
+    height: 235px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.cartao-conteudo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 258px;
+    padding: 28px;
+}
+
+.cartao-conteudo h3 {
+    margin-bottom: 14px;
+    color: var(--texto);
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.cartao-conteudo p {
+    margin-bottom: 24px;
+    color: var(--texto-secundario);
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+.cartao-conteudo a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 35px;
+    margin-top: auto;
+    color: #0b8747;
+    font-size: 14px;
+    font-weight: 800;
+    transition: color 0.2s ease;
+}
+
+.cartao-conteudo a:hover {
+    color: var(--verde-escuro);
+    text-decoration: underline;
+}
+
+.diferenciais {
+    padding: 85px 0 100px;
+    background: var(--superficie);
+    border-top: 1px solid var(--borda);
+}
+
+.grade-diferenciais {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.grade-diferenciais article {
+    min-width: 0;
+    padding: 28px;
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    background: var(--fundo);
+}
+
+.grade-diferenciais h3 {
+    margin-bottom: 13px;
+    color: var(--texto);
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.grade-diferenciais p {
+    color: var(--texto-secundario);
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+footer {
+    padding: 28px 20px;
+    background: #07140c;
+    color: #cbded1;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+nav a:focus-visible,
+.botao:focus-visible,
+.cartao-conteudo a:focus-visible,
+.marca:focus-visible {
+    outline: 3px solid var(--verde-claro);
+    outline-offset: 5px;
+}
+
+::selection {
+    background: var(--verde);
+    color: var(--preto);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --fundo: #08120c;
+        --superficie: #132219;
+        --texto: #f4faf5;
+        --texto-secundario: #b2c5b8;
+        --borda: #2a4433;
+    }
+
+    .secao-titulo .etiqueta,
+    .cartao-conteudo a {
+        color: #71f2a2;
+    }
+
+    .cartao-conteudo a:hover {
+        color: #b4ffd0;
+    }
+
+    .banner {
+        background-image:
+            linear-gradient(
+                90deg,
+                rgba(0, 7, 4, 0.9) 0%,
+                rgba(0, 7, 4, 0.65) 30%,
+                rgba(0, 7, 4, 0.19) 65%,
+                rgba(0, 7, 4, 0.06) 100%
+            ),
+            url("../assets/images/caminhao-volvo.png");
+    }
+
+    .cartao-servico:hover {
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+    }
+}
+
+@media (max-width: 1024px) {
+    .cabecalho {
+        padding: 12px 24px;
+        gap: 22px;
+    }
+
+    .logo {
+        width: 108px;
+        height: 96px;
+    }
+
+    nav {
+        column-gap: 22px;
+    }
+
+    nav a {
+        font-size: 14px;
+    }
+
+    .banner {
+        background-position: 56% center;
+    }
+
+    .banner .container {
+        padding-top: 180px;
+    }
+
+    .grade-servicos {
+        gap: 18px;
+    }
+
+    .cartao-servico img {
+        height: 200px;
+    }
+
+    .cartao-conteudo {
+        padding: 23px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cabecalho {
+        padding: 12px 20px;
+        gap: 16px;
+    }
+
+    .logo {
+        width: 95px;
+        height: 88px;
+    }
+
+    nav {
+        column-gap: 16px;
+        row-gap: 4px;
+    }
+
+    nav a {
+        min-height: 36px;
+        padding: 6px 0;
+        font-size: 13px;
+    }
+
+    .banner {
+        background-position: 58% center;
+    }
+
+    .banner .container {
+        padding-top: 185px;
+    }
+
+    .grade-servicos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .cartao-servico:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .cartao-servico:last-child img {
+        height: 270px;
+    }
+
+    .grade-diferenciais {
+        grid-template-columns: 1fr;
+    }
+
+    .modalidades {
+        padding: 75px 0 85px;
+    }
+
+    .diferenciais {
+        padding: 70px 0 80px;
+    }
+}
+
+@media (max-width: 600px) {
+    header {
+        min-height: 150px;
+    }
+
+    .cabecalho {
+        min-height: 150px;
+        flex-direction: column;
+        justify-content: center;
+        padding: 10px 14px;
+        gap: 5px;
+    }
+
+    .logo {
+        width: 90px;
+        height: 80px;
+    }
+
+    nav {
+        width: 100%;
+        justify-content: center;
+        column-gap: 15px;
+        row-gap: 3px;
+    }
+
+    nav a {
+        min-height: 32px;
+        padding: 5px 0;
+        font-size: 12px;
+    }
+
+    .banner {
+        min-height: 720px;
+        min-height: 100svh;
+        background-position: 60% center;
+    }
+
+    .banner .container {
+        padding-top: 225px;
+        padding-bottom: 65px;
+    }
+
+    .banner h1 {
+        font-size: clamp(34px, 9vw, 47px);
+        letter-spacing: -0.8px;
+    }
+
+    .banner p {
+        font-size: 15px;
+    }
+
+    .botao {
+        width: 100%;
+        max-width: 320px;
+        font-size: 14px;
+    }
+
+    .secao-titulo {
+        margin-bottom: 30px;
+    }
+
+    .secao-titulo p {
+        font-size: 15px;
+    }
+
+    .grade-servicos {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .cartao-servico:last-child {
+        grid-column: auto;
+    }
+
+    .cartao-servico img,
+    .cartao-servico:last-child img {
+        height: 220px;
+    }
+
+    .cartao-conteudo {
+        min-height: auto;
+        padding: 25px;
+    }
+
+    .cartao-conteudo h3 {
+        font-size: 20px;
+    }
+
+    .grade-diferenciais article {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 380px) {
+    .cabecalho {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    nav {
+        column-gap: 11px;
+    }
+
+    nav a {
+        font-size: 11px;
+    }
+
+    .banner .container {
+        padding-top: 235px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
