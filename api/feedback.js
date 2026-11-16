@@ -216,6 +216,57 @@ async function enviarAlerta(texto, analise) {
     }
 }
 
+const LIMITE_FEEDBACK = 5;
+const JANELA_FEEDBACK_MS = 10 * 60 * 1000;
+
+async function verificarLimiteFeedback(uid) {
+    const referencia = db.collection("limites_feedback").doc(uid);
+
+    return db.runTransaction(async (transacao) => {
+        const registro = await transacao.get(referencia);
+        const agora = Date.now();
+
+        if (!registro.exists) {
+            transacao.set(referencia, {
+                inicioJanela: agora,
+                tentativas: 1
+            });
+
+            return { permitido: true };
+        }
+
+        const dados = registro.data();
+        const inicio = Number(dados.inicioJanela) || 0;
+        const tentativas = Number(dados.tentativas) || 0;
+        const tempoDecorrido = agora - inicio;
+
+        if (tempoDecorrido >= JANELA_FEEDBACK_MS || tempoDecorrido < 0) {
+            transacao.set(referencia, {
+                inicioJanela: agora,
+                tentativas: 1
+            });
+
+            return { permitido: true };
+        }
+
+        if (tentativas >= LIMITE_FEEDBACK) {
+            return {
+                permitido: false,
+                aguardar: Math.max(
+                    1,
+                    Math.ceil((JANELA_FEEDBACK_MS - tempoDecorrido) / 1000)
+                )
+            };
+        }
+
+        transacao.update(referencia, {
+            tentativas: tentativas + 1
+        });
+
+        return { permitido: true };
+    });
+}
+
 export default async function handler(req, res) {
     res.setHeader("Cache-Control", "no-store");
 
@@ -262,12 +313,33 @@ export default async function handler(req, res) {
     const encomendaId = req.body?.encomendaId;
 
     if (
-        encomendaId !== undefined &&
-        (typeof encomendaId !== "string" ||
-        !/^[a-zA-Z0-9_-]{1,120}$/.test(encomendaId))
+        typeof encomendaId !== "string" ||
+        !/^[a-zA-Z0-9_-]{1,120}$/.test(encomendaId)
     ) {
         return res.status(400).json({
             erro: "Identificador de encomenda inválido."
+        });
+    }
+
+    let limite;
+
+    try {
+        limite = await verificarLimiteFeedback(
+            autenticacao.usuario.uid
+        );
+    } catch (erro) {
+        console.error("Falha no controle de requisições:", erro.message);
+
+        return res.status(503).json({
+            erro: "Serviço temporariamente indisponível."
+        });
+    }
+
+    if (!limite.permitido) {
+        res.setHeader("Retry-After", String(limite.aguardar));
+
+        return res.status(429).json({
+            erro: "Limite de 5 tentativas em 10 minutos atingido. Tente novamente mais tarde."
         });
     }
 
