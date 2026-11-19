@@ -216,6 +216,50 @@ async function enviarAlerta(texto, analise) {
     }
 }
 
+
+async function usuarioPodeAvaliar(dados, usuario, transacao = null) {
+    // Compatibilidade com as encomendas antigas.
+    if (dados.clienteUid) {
+        return dados.clienteUid === usuario.uid;
+    }
+
+    // Novas encomendas exigem vínculo autorizado.
+    const hash = dados.documentoHash;
+
+    if (typeof hash !== "string" ||
+        !/^[a-f0-9]{64}$/i.test(hash) ||
+        !usuario.email || !usuario.email_verified) {
+        return false;
+    }
+
+    const clienteRef = db.collection("clientes").doc(usuario.uid);
+    const vinculoRef = db.collection("documentosVinculados").doc(hash);
+
+    const ler = transacao
+        ? ref => transacao.get(ref)
+        : ref => ref.get();
+
+    const [clienteDoc, vinculoDoc] = await Promise.all([
+        ler(clienteRef),
+        ler(vinculoRef)
+    ]);
+
+    if (!clienteDoc.exists || !vinculoDoc.exists) {
+        return false;
+    }
+
+    const cliente = clienteDoc.data();
+    const vinculo = vinculoDoc.data();
+    const email = usuario.email.toLowerCase();
+
+    return (
+        cliente.documentoHash === hash &&
+        vinculo.firebaseUid === usuario.uid &&
+        cliente.email?.toLowerCase() === email &&
+        vinculo.email?.toLowerCase() === email
+    );
+}
+
 const LIMITE_FEEDBACK = 5;
 const JANELA_FEEDBACK_MS = 10 * 60 * 1000;
 
@@ -359,7 +403,7 @@ export default async function handler(req, res) {
 
             const dados = encomenda.data();
 
-            if (dados.clienteUid !== autenticacao.usuario.uid) {
+            if (!await usuarioPodeAvaliar(dados, autenticacao.usuario)) {
                 return res.status(403).json({
                     erro: "Esta encomenda não pertence à sua conta."
                 });
@@ -405,7 +449,7 @@ export default async function handler(req, res) {
 
                 const dados = encomenda.data();
 
-                if (dados.clienteUid !== autenticacao.usuario.uid) {
+                if (!await usuarioPodeAvaliar(dados, autenticacao.usuario, transacao)) {
                     throw Object.assign(
                         new Error("Esta encomenda não pertence à sua conta."),
                         { statusCode: 403 }

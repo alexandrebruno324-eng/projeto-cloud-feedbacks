@@ -95,7 +95,11 @@ async function executarApi(req, res, caminho) {
     const modulos = {
         "/api/feedback": "./api/feedback.js",
         "/api/encomendas": "./api/encomendas.js",
-        "/api/minhas-avaliacoes": "./api/minhas-avaliacoes.js"
+        "/api/minhas-avaliacoes": "./api/minhas-avaliacoes.js",
+        "/api/admin-feedbacks": "./api/admin-feedbacks.js",
+        "/api/criar-encomenda": "./api/criar-encomenda.js",
+        "/api/vincular-documento": "./api/vincular-documento.js",
+        "/api/reenviar-vinculacao": "./api/reenviar-vinculacao.js"
     };
 
     const modulo = modulos[caminho];

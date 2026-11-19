@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Central de Feedbacks | BRN Transportes</title>
+<style>
+:root {
+    color-scheme: dark;
+    font-family: Arial, sans-serif;
+    background: #07120d;
+    color: #f4fff7;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+header {
+    background: #0d2116;
+    border-bottom: 1px solid #24563a;
+    padding: 20px max(5%, calc((100% - 1200px) / 2));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+.marca {
+    font-size: 25px;
+    font-weight: 900;
+    color: #46e184;
+    letter-spacing: 2px;
+}
+header a { color: #d9f6e2; text-decoration: none; }
+main { max-width: 1200px; margin: auto; padding: 45px 20px; }
+.etiqueta { color: #51e68d; font-size: 12px; letter-spacing: 2px; }
+h1 { font-size: clamp(28px, 5vw, 44px); margin: 12px 0; }
+.subtitulo { color: #a9b9ae; line-height: 1.6; }
+.grade {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin: 35px 0;
+}
+.indicador, .cartao {
+    background: #102419;
+    border: 1px solid #244232;
+    border-radius: 15px;
+    padding: 22px;
+}
+.indicador span { color: #a9b9ae; font-size: 13px; }
+.indicador strong { display: block; margin-top: 12px; font-size: 35px; }
+.controles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+input, select, button {
+    padding: 13px;
+    border-radius: 9px;
+    font-size: 14px;
+}
+input, select {
+    border: 1px solid #376149;
+    background: #0c1b13;
+    color: white;
+}
+input { flex: 1; min-width: 190px; }
+button {
+    background: #28b765;
+    color: #07120d;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+button:hover { background: #53e18c; }
+.cartao { margin-bottom: 14px; overflow-wrap: anywhere; }
+.linha {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+.codigo { font-weight: bold; color: #69eba0; }
+.selo {
+    padding: 7px 11px;
+    border-radius: 30px;
+    background: #284635;
+    font-size: 12px;
+}
+.positivo { background: #174c32; color: #9ef3bb; }
+.negativo { background: #532729; color: #ffb8b8; }
+.neutro { background: #49401f; color: #ffeb9d; }
+.comentario {
+    margin: 20px 0;
+    white-space: pre-wrap;
+    line-height: 1.65;
+}
+.meta { color: #b2c0b6; font-size: 13px; line-height: 1.8; }
+#mensagem { padding: 18px 0; color: #c6d3ca; }
+[hidden] { display: none !important; }
+@media (max-width: 750px) {
+    .grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    header { padding: 20px; }
+}
+</style>
+<script type="module">
+import { auth } from "./js/firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+
+const painel = document.getElementById("painel");
+const mensagem = document.getElementById("mensagem");
+const lista = document.getElementById("lista");
+const filtro = document.getElementById("filtro");
+const pesquisa = document.getElementById("pesquisa");
+const atualizar = document.getElementById("atualizar");
+
+let feedbacks = [];
+let usuarioAtual = null;
+
+function elemento(tag, classe, texto) {
+    const el = document.createElement(tag);
+    if (classe) el.className = classe;
+    if (texto !== undefined) el.textContent = String(texto);
+    return el;
+}
+
+function contar(sentimento) {
+    return feedbacks.filter(
+        item => item.sentimento?.toLowerCase() === sentimento
+    ).length;
+}
+
+function atualizarIndicadores() {
+    document.getElementById("total").textContent = feedbacks.length;
+    document.getElementById("positivos").textContent = contar("positivo");
+    document.getElementById("neutros").textContent = contar("neutro");
+    document.getElementById("negativos").textContent = contar("negativo");
+}
+
+function renderizar() {
+    const termo = pesquisa.value.toLowerCase().trim();
+    const sentimento = filtro.value;
+
+    const resultados = feedbacks.filter(item => {
+        const correspondeSentimento =
+            !sentimento || item.sentimento?.toLowerCase() === sentimento;
+
+        const textoPesquisa = [
+            item.texto,
+            item.categoria,
+            item.encomendaId,
+            item.clienteUid
+        ].join(" ").toLowerCase();
+
+        return correspondeSentimento && textoPesquisa.includes(termo);
+    });
+
+    lista.replaceChildren();
+
+    if (!resultados.length) {
+        lista.appendChild(elemento("p", "subtitulo", "Nenhuma avaliação encontrada."));
+        return;
+    }
+
+    for (const item of resultados) {
+        const cartao = elemento("article", "cartao");
+        const cabecalho = elemento("div", "linha");
+
+        cabecalho.appendChild(
+            elemento("span", "codigo", item.codigoRastreamento
+                ? `Encomenda: ${item.codigoRastreamento}`
+                : item.encomendaId
+                ? `Encomenda: ${item.encomendaId}`
+                : "Feedback antigo sem encomenda vinculada")
+        );
+
+        const classe = ["positivo", "negativo", "neutro"]
+            .includes(item.sentimento?.toLowerCase())
+            ? item.sentimento.toLowerCase()
+            : "";
+
+        cabecalho.appendChild(
+            elemento("span", `selo ${classe}`, item.sentimento || "Não classificado")
+        );
+
+        cartao.appendChild(cabecalho);
+        cartao.appendChild(
+            elemento("p", "comentario", item.texto || "Sem comentário.")
+        );
+
+        const meta = elemento("div", "meta");
+        meta.appendChild(
+            elemento("div", "", `Categoria: ${item.categoria || "Não informada"}`)
+        );
+
+        if (item.clienteUid) {
+            meta.appendChild(
+                elemento("div", "", `Cliente: ${item.clienteUid}`)
+            );
+        }
+
+        if (item.criadoEm) {
+            const data = new Date(item.criadoEm);
+            if (!Number.isNaN(data.getTime())) {
+                meta.appendChild(
+                    elemento("div", "", `Recebido em: ${data.toLocaleString("pt-BR")}`)
+                );
+            }
+        }
+
+        cartao.appendChild(meta);
+        lista.appendChild(cartao);
+    }
+}
+
+async function carregar() {
+    if (!usuarioAtual) return;
+
+    mensagem.textContent = "Consultando os feedbacks...";
+    atualizar.disabled = true;
+
+    try {
+        const token = await usuarioAtual.getIdToken();
+
+        const resposta = await fetch("/api/admin-feedbacks", {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: "no-store"
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(dados.erro || "Não foi possível acessar o painel.");
+        }
+
+        if (!Array.isArray(dados.feedbacks)) {
+            throw new Error("Resposta inválida da API.");
+        }
+
+        feedbacks = dados.feedbacks;
+        atualizarIndicadores();
+        renderizar();
+
+        painel.hidden = false;
+        mensagem.textContent =
+            `${feedbacks.length} avaliações carregadas (máximo de 100 registros nesta versão).`;
+
+    } catch (erro) {
+        painel.hidden = true;
+        mensagem.textContent = erro.message;
+    } finally {
+        atualizar.disabled = false;
+    }
+}
+
+
+const formularioEncomenda = document.getElementById("form-nova-encomenda");
+const botaoCadastrar = document.getElementById("botao-cadastrar");
+const resultadoCadastro = document.getElementById("resultado-cadastro");
+
+formularioEncomenda.addEventListener("submit", async evento => {
+    evento.preventDefault();
+
+    if (!usuarioAtual || !formularioEncomenda.reportValidity()) {
+        return;
+    }
+
+    botaoCadastrar.disabled = true;
+    resultadoCadastro.textContent = "Cadastrando encomenda...";
+
+    try {
+        const token = await usuarioAtual.getIdToken();
+
+        const resposta = await fetch("/api/criar-encomenda", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                cpfCnpj: document.getElementById("documento-novo-cliente").value.trim(),
+                telefone: document.getElementById("telefone-novo-cliente").value.trim(),
+                emailCliente: document.getElementById("email-novo-cliente").value.trim(),
+                origem: document.getElementById("origem-nova").value.trim(),
+                destino: document.getElementById("destino-novo").value.trim(),
+                previsaoEntrega: document.getElementById("previsao-nova").value
+            })
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(dados.erro || "Erro ao cadastrar encomenda.");
+        }
+
+        const mensagensEmail = {
+            aceito_pelo_resend:
+                "E-mail enviado ao Resend. Aguarde a confirmação de entrega.",
+            falha:
+                "ATENÇÃO: o e-mail não foi enviado. Entregue o código ao destinatário por um canal seguro.",
+            nao_configurado:
+                "ATENÇÃO: envio de e-mail não configurado.",
+        };
+
+        const situacaoEmail = mensagensEmail[dados.envioEmail] ||
+            "Não foi possível confirmar o envio do e-mail.";
+
+        resultadoCadastro.textContent =
+            `Encomenda cadastrada com sucesso!
+Rastreamento: ${dados.codigo}
+Status do e-mail: ${situacaoEmail}
+O código secreto não é exibido por segurança.
+Se o envio falhou, será necessário emitir outro código pelo procedimento de reenvio.`;
+
+        formularioEncomenda.reset();
+
+    } catch (erro) {
+        resultadoCadastro.textContent = erro.message;
+    } finally {
+        botaoCadastrar.disabled = false;
+    }
+});
+
+pesquisa.addEventListener("input", renderizar);
+filtro.addEventListener("change", renderizar);
+atualizar.addEventListener("click", carregar);
+
+onAuthStateChanged(auth, usuario => {
+    usuarioAtual = usuario;
+
+    if (!usuario) {
+        painel.hidden = true;
+        mensagem.textContent = "Faça login na área do cliente para solicitar acesso administrativo.";
+        return;
+    }
+
+    if (!usuario.emailVerified) {
+        painel.hidden = true;
+        mensagem.textContent = "Confirme seu e-mail antes de continuar.";
+        return;
+    }
+
+    carregar();
+});
+</script>
+</head>
+<body>
+<header>
+    <div class="marca">BRN <span style="color:white;font-size:12px">TRANSPORTES</span></div>
+    <a href="home.html">Voltar ao site</a>
+</header>
+
+<main>
+    <span class="etiqueta">GESTÃO INTELIGENTE</span>
+    <h1>Central de Feedbacks</h1>
+    <p class="subtitulo">
+        Acompanhamento das avaliações de clientes e análise de sentimentos com inteligência artificial.
+    </p>
+
+    <p id="mensagem" role="status">Verificando autorização...</p>
+
+
+<section id="painel" hidden>
+    <div class="cartao" style="margin:25px 0 35px">
+        <span class="etiqueta">GESTÃO DE ENCOMENDAS</span>
+        <h2>Cadastrar nova encomenda</h2>
+        <p class="subtitulo">
+            Cadastre uma entrega e gere automaticamente seu código de rastreamento.
+        </p>
+
+        <form id="form-nova-encomenda">
+            <div class="controles">
+                <input
+                    id="documento-novo-cliente"
+                    type="text"
+                    placeholder="CPF ou CNPJ do destinatário"
+                    maxlength="18"
+                    autocomplete="off"
+                    required
+                >
+                <input
+                    id="telefone-novo-cliente"
+                    type="tel"
+                    placeholder="Telefone com DDD"
+                    maxlength="16"
+                    autocomplete="off"
+                    required
+                >
+                <input
+                    id="email-novo-cliente"
+                    type="email"
+                    placeholder="E-mail do cliente"
+                    maxlength="254"
+                    required
+                >
+                <input
+                    id="origem-nova"
+                    type="text"
+                    placeholder="Origem"
+                    maxlength="120"
+                    required
+                >
+                <input
+                    id="destino-novo"
+                    type="text"
+                    placeholder="Destino"
+                    maxlength="120"
+                    required
+                >
+                <input
+                    id="previsao-nova"
+                    type="date"
+                    required
+                >
+            </div>
+
+            <button id="botao-cadastrar" type="submit">
+                Cadastrar encomenda
+            </button>
+        </form>
+
+        <p id="resultado-cadastro" role="status"></p>
+    </div>
+
+        <div class="grade">
+            <div class="indicador"><span>Total</span><strong id="total">0</strong></div>
+            <div class="indicador"><span>Positivos</span><strong id="positivos">0</strong></div>
+            <div class="indicador"><span>Neutros</span><strong id="neutros">0</strong></div>
+            <div class="indicador"><span>Negativos</span><strong id="negativos">0</strong></div>
+        </div>
+
+        <div class="controles">
+            <input id="pesquisa" type="search" placeholder="Pesquisar comentários, categorias ou encomendas">
+            <select id="filtro" aria-label="Filtrar por sentimento">
+                <option value="">Todos os sentimentos</option>
+                <option value="positivo">Positivos</option>
+                <option value="neutro">Neutros</option>
+                <option value="negativo">Negativos</option>
+            </select>
+            <button id="atualizar" type="button">Atualizar</button>
+        </div>
+
+        <div id="lista"></div>
+    </section>
+</main>
+</body>
+</html>

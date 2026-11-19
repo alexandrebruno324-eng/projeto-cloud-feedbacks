@@ -327,6 +327,86 @@ async function carregarEncomendas(usuario) {
     atualizarAvaliacoes();
 }
 
+const formularioVinculacao =
+    document.getElementById("form-vincular-documento");
+
+const campoDocumento =
+    document.getElementById("documento-vinculacao");
+
+const campoCodigoVinculacao =
+    document.getElementById("codigo-vinculacao");
+
+const botaoVincular =
+    document.getElementById("botao-vincular");
+
+const mensagemVinculacao =
+    document.getElementById("mensagem-vinculacao");
+
+formularioVinculacao.addEventListener("submit", async evento => {
+    evento.preventDefault();
+
+    const usuario = usuarioAtual;
+
+    if (!usuario || auth.currentUser?.uid !== usuario.uid) {
+        mensagemVinculacao.textContent =
+            "Entre na sua conta para vincular suas encomendas.";
+        return;
+    }
+
+    const cpfCnpj = campoDocumento.value.trim();
+    const codigo = campoCodigoVinculacao.value.trim();
+
+    botaoVincular.disabled = true;
+    mensagemVinculacao.textContent = "Validando seu vínculo...";
+
+    try {
+        const token = await usuario.getIdToken();
+
+        const resposta = await fetch("/api/vincular-documento", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ cpfCnpj, codigo }),
+            cache: "no-store"
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(
+                dados.erro || "Não foi possível vincular o documento."
+            );
+        }
+
+        if (auth.currentUser?.uid !== usuario.uid) {
+            return;
+        }
+
+        formularioVinculacao.reset();
+        mensagemVinculacao.textContent =
+            "Documento vinculado! Atualizando suas encomendas...";
+
+        try {
+            await carregarEncomendas(usuario);
+
+            mensagemVinculacao.textContent =
+                "Documento vinculado com sucesso! Suas encomendas foram atualizadas.";
+        } catch {
+            mensagemVinculacao.textContent =
+                "Documento vinculado com sucesso. Atualize a página para consultar suas encomendas.";
+        }
+    } catch (erro) {
+        if (auth.currentUser?.uid === usuario.uid) {
+            mensagemVinculacao.textContent =
+                erro.message || "Erro ao validar o vínculo.";
+        }
+    } finally {
+        botaoVincular.disabled = false;
+    }
+});
+
 async function verificarUsuario(usuario) {
     if (!usuario) {
         usuarioAtual = null;

@@ -9,3 +9,6 @@ node_modules/
 
 *.bak
 vercel.log
+.env.vercel.local
+
+backups-antigos/

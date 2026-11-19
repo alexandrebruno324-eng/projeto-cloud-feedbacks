@@ -160,6 +160,51 @@
                 </div>
 
                 <div class="barra-pesquisa">
+                    <form id="form-vincular-documento">
+                        <h3>Vincular minhas encomendas</h3>
+                        <p>
+                            Informe seu CPF ou CNPJ e o código secreto
+                            fornecido pela BRN para associar suas entregas.
+                        </p>
+
+                        <label for="documento-vinculacao">
+                            CPF ou CNPJ
+                        </label>
+                        <input
+                            type="text"
+                            id="documento-vinculacao"
+                            placeholder="Digite seu CPF ou CNPJ"
+                            autocomplete="off"
+                            required
+                        >
+
+                        <label for="codigo-vinculacao">
+                            Código secreto de vinculação
+                        </label>
+                        <input
+                            type="text"
+                            id="codigo-vinculacao"
+                            placeholder="Digite o código recebido"
+                            autocomplete="off"
+                            minlength="20"
+                            maxlength="128"
+                            required
+                        >
+
+                        <button type="submit" id="botao-vincular">
+                            Vincular encomendas
+                        </button>
+
+                        <p
+                            id="mensagem-vinculacao"
+                            class="mensagem"
+                            role="status"
+                            aria-live="polite"
+                        ></p>
+                    </form>
+                </div>
+
+                <div class="barra-pesquisa">
                     <form id="form-rastreamento">
                         <label for="codigo-rastreamento">
                             Código de rastreamento
